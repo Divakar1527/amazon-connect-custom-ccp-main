@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/amazon-connect-streams/release/connect-streams-min.js"
+    ></script>
+  </head>
+  <!-- Add the call to init() as an onload so it will only run once the page is loaded -->
+  <!-- <body onload="init()"> -->
+  <body>
+    <div id="container-div" style="width: 400px; height: 500px"></div>
+    <script type="text/javascript">
+          var containerDiv = document.getElementById("container-div");
+          var instanceURL = "https://voicecc.awsapps.com/connect/ccp-v2/";
+          // initialize the streams api
+          //   async function init() {
+          // initialize the ccp
+          connect.core.initCCP(containerDiv, {
+            ccpUrl: instanceURL, // REQUIRED
+            loginPopup: true, // optional, defaults to `true`
+            loginPopupAutoClose: true, // optional, defaults to `false`
+            loginOptions: {
+              // optional, if provided opens login in new window
+              autoClose: true, // optional, defaults to `false`
+              height: 600, // optional, defaults to 578
+              width: 400, // optional, defaults to 433
+              top: 0, // optional, defaults to 0
+              left: 0, // optional, defaults to 0
+            },
+            region: "us-east-1", // REQUIRED for `CHAT`, optional otherwise
+            //   softphone: {
+            //     // optional, defaults below apply if not provided
+            //     allowFramedSoftphone: true, // optional, defaults to false
+            //     disableRingtone: false, // optional, defaults to false
+            //     ringtoneUrl: '[your-ringtone-filepath].mp3', // optional, defaults to CCP’s default ringtone if a falsy value is set
+            //     disableEchoCancellation: false, // optional, defaults to false
+            //     allowFramedVideoCall: true, // optional, default to false
+            //     allowFramedScreenSharing: true, // optional, default to false
+            //     allowFramedScreenSharingPopUp: true, // optional, default to false
+            //     VDIPlatform: null, // optional, provide with 'CITRIX' if using Citrix VDI, or use enum VDIPlatformType
+            //     allowEarlyGum: true, //optional, default to true
+            //   },
+            //   task: {
+            //     disableRingtone: false, // optional, defaults to false
+            //     ringtoneUrl: "[your-ringtone-filepath].mp3" // optional, defaults to CCP's default ringtone if a falsy value is set
+            //   },
+            //   storageAccess: {
+            //     canRequest: false, // By default this is set to false. You can set it to true to opt in for checking storage access.
+            //     mode: "custom", // To use the default banner, set this to "default"
+            //     /** More customization options can be found here: https://github.com/amazon-connect/amazon-connect-streams/blob/master/src/index.d.ts under StorageAccessParameters */
+            //   },
+            //   pageOptions: { //optional
+            //     enableAudioDeviceSettings: false, //optional, defaults to 'false'
+            //     enableVideoDeviceSettings: false, //optional, defaults to 'false'
+            //     enablePhoneTypeSettings: true //optional, defaults to 'true'
+            //   },
+            //   shouldAddNamespaceToLogs: false, //optional, defaults to 'false'
+            //   ccpAckTimeout: 5000, //optional, defaults to 3000 (ms)
+            //   ccpSynTimeout: 3000, //optional, defaults to 1000 (ms)
+            //   ccpLoadTimeout: 10000 //optional, defaults to 5000 (ms)
+          });
+          // Set up a chat listener
+          // displayMessageToAgent("translated message")
+          //   }
+          //   console.log("connect.ConnectionType :: ", connect.ConnectionType);
+          connect.contact((contact) => {
+            
+            console.log("contact :: ",contact.getType());
+            console.log("contact Data :: ",contact);
+            console.log("getContactMetadata :: ",contact.getContactMetadata());
+            console.log("Test :; ");
+        //     const cons = contact.getConnections()
+        //     console.log("list Connections :: ",cons);
+
+        //     const cnn = contact
+        //     .getConnections()
+        //     .find((cnn) => cnn.getType() === connect.ConnectionType.AGENT);
+            
+        //     console.log("connection data :: ",cnn);
+        //     console.log("cnn.getMediaInfo() :: ",cnn.getMediaInfo());
+        //     console.log("connect.core.getWebSocketManager()::",connect.core.getWebSocketManager());
+
+        //     const agentChatSession = connect.ChatSession.create({
+        //     chatDetails: cnn.getMediaInfo(), // REQUIRED
+        //     options: {
+        //       // REQUIRED
+        //       region: "us-east-1", // REQUIRED, must match the value provided to `connect.core.initCCP()`
+        //     },
+        //     type: connect.ChatSession.SessionTypes.AGENT, // REQUIRED
+        //     websocketManager: connect.core.getWebSocketManager(), // REQUIRED
+        //   });
+
+        //   console.log("agentChatSession :: ",agentChatSession);
+            // Listen for chat messages
+
+            contact.onMessage(async (message) => {
+              console.log("New message received:", message.content);
+              // Call Lambda to translate the message
+              const translatedText = "Hii in spanish";
+              // await invokeLambdaTranslate(
+              //   message.content,
+              //   "es",
+              //   "en"
+              // );
+              // Display the translated message in the chat log
+              displayMessageToAgent(translatedText);
+            });
+    //         console.log("Contact initialized:", contact);
+    //         const chatDetails = contact.getConnectionDetails();
+    //         console.log("chatDetails ::");
+    //         connect.ChatSession.create({
+    //         chatDetails: chatDetails.chatDetails,
+    //         connectionToken: chatDetails.connectionToken,
+    //         type: connect.ChatSession.SessionTypes.AGENT,
+    //             }).then(chatSession => {
+    //                 console.log("Chat session created:", chatSession);
+
+    //     // Subscribe to incoming chat messages
+    //           chatSession.onMessage(message => {
+    //               console.log("Incoming message:", message);
+    //           })
+    //       });
+      })
+            //   let translatedText = "Hii in spanish"
+            //   displayMessageToAgent(translatedText);
+            // displayMessageToAgent("Hii in spanish");
+            // contact.onAccepted(async (message) => {
+            //   console.log("message incoming");
+            // });
+          // });
+          // Function to invoke Lambda for translation
+          async function invokeLambdaTranslate(text, sourceLang, targetLang) {
+            try {
+              const response = await fetch(
+                "https://your-api-endpoint.amazonaws.com/translate",
+                {
+                  // Replace with your API Gateway endpoint
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ text, sourceLang, targetLang }),
+                }
+              );
+
+              if (!response.ok) {
+                throw new Error(`Error: ${response.statusText}`);
+              }
+
+              const data = await response.json();
+              console.log("Translated text:", data.translatedText);
+              return data.translatedText;
+            } catch (error) {
+              console.error("Translation failed:", error);
+              return "Translation Error";
+            }
+          }
+
+          // Function to display the message to the agent
+          function displayMessageToAgent(message) {
+            const chatLog = document.getElementById("chat-log");
+            const messageElement = document.createElement("div");
+            messageElement.textContent = `Translated Message: ${message}`;
+            chatLog.appendChild(messageElement);
+            document.getElementById("chat-log") = chatLog;
+          }
+    </script>
+  </body>
+</html>
